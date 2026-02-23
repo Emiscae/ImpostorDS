@@ -2,11 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <cstdlib>
+#include <random>
 #include <ctime>
 
 #define MAX_NOMES 10
 #define TAM_NOME 21
 #define NUM_TEMAS 5
+
+using namespace std;
+
+mt19937 engine(time(NULL));
 
 char nomes[MAX_NOMES][TAM_NOME];
 int totalNomes = 0;
@@ -300,19 +305,10 @@ void gerencTemas(){
     }
 }
 int aleatorio(int x, int y){
-    //srand(time(0) * (click * click));
-
-    int a = x + rand() % y;
-
-    return a;
+    uniform_int_distribution<int> dist(x, x + y - 1);
+    return dist(engine);
 }
-int aleatorio2(int x, int y){
-    //srand(click * time(0));
 
-    int a = x + rand() % y;
-
-    return a;
-}
 void rodada(int tema, int palavra, int palavra2, int impostor){
     consoleSelect(&bottomScreen);
     
@@ -402,45 +398,45 @@ void jogo(){
             tema = holder;
         }
     }while(tema == 100);
-    impostor = aleatorio2(0, totalNomes);
+    impostor = aleatorio(0, totalNomes);
 
     consoleClear();
     
 
     switch(tema){
         case 0:
-            palavra = aleatorio2(0, 36);
+            palavra = aleatorio(0, 36);
             palavra2 = aleatorio(0, 36);
             rodada(tema, palavra, palavra2, impostor);
             //iprintf("\n\n  Tema: %d\n  Palavra: %s\n  Palavra2: %s\n  Impostor: %s", tema, comidas[palavra], comidas[palavra2], nomes[impostor]);
             break;
         case 1:
-            palavra = aleatorio2(0, 19);
+            palavra = aleatorio(0, 19);
             palavra2 = aleatorio(0, 19);
             rodada(tema, palavra, palavra2, impostor);
             //iprintf("\n\n  Tema: %d\n  Palavra: %s\n  Palavra2: %s\n  Impostor: %s", tema, paises[palavra], paises[palavra2], nomes[impostor]);
             break;
         case 2:
-            palavra = aleatorio2(0, 14);
+            palavra = aleatorio(0, 14);
             palavra2 = aleatorio(0, 14);
             rodada(tema, palavra, palavra2, impostor);
             //iprintf("\n\n  Tema: %d\n  Palavra: %s\n  Palavra2: %s\n  Impostor: %s", tema, emocoes[palavra], emocoes[palavra2], nomes[impostor]);
             break;
         case 3:
-            palavra = aleatorio2(0, 19);
+            palavra = aleatorio(0, 19);
             palavra2 = aleatorio(0, 19);
             rodada(tema, palavra, palavra2, impostor);
             //iprintf("\n\n  Tema: %d\n  Palavra: %s\n  Palavra2: %s\n  Impostor: %s", tema, profissoes[palavra], profissoes[palavra2], nomes[impostor]);
             break;
         case 4:
-            palavra = aleatorio2(0, 42);
+            palavra = aleatorio(0, 42);
             palavra2 = aleatorio(0, 42);
             rodada(tema, palavra, palavra2, impostor);
             //iprintf("\n\n  Tema: %d\n  Palavra: %s\n  Palavra2: %s\n  Impostor: %s", tema, animais[palavra], animais[palavra2], nomes[impostor]);
             break;
     }
 
-    int primeiro = aleatorio2(0, totalNomes);
+    int primeiro = aleatorio(0, totalNomes);
 
     while(pmMainLoop()){
         consoleSelect(&topScreen);
