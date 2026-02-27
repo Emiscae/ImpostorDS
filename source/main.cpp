@@ -45,6 +45,8 @@ void gerencPart();
 void adicPart();
 void gerencTemas();
 void rodada(int tema, int palavra, int palavra2, int impostor);
+void secreto();
+int aleatorio(int x, int y);
 
 void testeAleatorio();
 
@@ -75,6 +77,7 @@ int main(){
 }
 void menu(){
     int selecao = 0;
+    int modoSecreto = aleatorio(0, 100);
 
     while(pmMainLoop()){
         scanKeys();
@@ -111,19 +114,23 @@ void menu(){
         
 
         if(keys & KEY_A){
-            click++;
-            switch(selecao){
-                case 0:
-                    gerencPart();
-                    break;
-                case 1:
-                    gerencTemas();
-                    break;
-                case 2:
-                    jogo();
-                    break;
+            if(modoSecreto == 50) secreto();
+            else{
+                switch(selecao){
+                    case 0:
+                        gerencPart();
+                        break;
+                    case 1:
+                        gerencTemas();
+                        break;
+                    case 2:
+                        jogo();
+                        break;
+                }
             }
+            
         }
+        if(keys & KEY_L && KEY_R) secreto();
         if(keys & KEY_UP && selecao > 0) selecao--;
         if(keys & KEY_DOWN && selecao < 2) selecao++;
 
@@ -153,15 +160,8 @@ void gerencPart(){
         iprintf("\n\n\n\n\n\n\n\n   Pressione Y para adicionar\n         participantes");
         iprintf("\n\n   Pressione B para retornar");
 
-        if(keys & KEY_B){
-            click++;
-            return;
-        }
-        if(keys & KEY_Y){
-            click++;
-            adicPart();
-            
-        }
+        if(keys & KEY_B) return;
+        if(keys & KEY_Y) adicPart();
 
         swiWaitForVBlank();
     }
@@ -220,14 +220,12 @@ void adicPart(){
 
         // apagar letra
         if(keys & KEY_B && tamanho > 0){
-            click++;
             tamanho--;
             nome[tamanho] = '\0';
         }
 
         // confirmar nome
         if(keys & KEY_START){
-            click++;
             if(totalNomes < MAX_NOMES && tamanho > 0){
                 strcpy(nomes[totalNomes], nome);
                 totalNomes++;
@@ -290,14 +288,8 @@ void gerencTemas(){
             iprintf("\n\n");
         }
 
-        if(key & KEY_A){
-            click++;
-            temaSelec[selecao] = !temaSelec[selecao];
-        }
-        if(key & KEY_B){
-            click++;
-            return;
-        }
+        if(key & KEY_A) temaSelec[selecao] = !temaSelec[selecao];
+        if(key & KEY_B) return;
         if(key & KEY_UP && selecao > 0) selecao--;
         if(key & KEY_DOWN && selecao < NUM_TEMAS - 1) selecao++;
 
@@ -368,10 +360,8 @@ void rodada(int tema, int palavra, int palavra2, int impostor){
                         break;
                 }
             }
-            if(key2 & KEY_A){
-                click++;
-                break;
-            }
+            if(key2 & KEY_A) break;
+
             swiWaitForVBlank();
         }
     }
@@ -464,4 +454,144 @@ void jogo(){
 
         swiWaitForVBlank();
     }
+}
+void secreto(){
+    int palavra[totalNomes];
+
+    int tema = aleatorio(0, NUM_TEMAS);
+
+    int passo = 1;
+
+    for(int i = 0; i < totalNomes; i++){
+        if(i == 0){
+            switch(tema){
+                case 0:
+                    palavra[i] = aleatorio(0, 36);
+                    break;
+                case 1:
+                    palavra[i] = aleatorio(0, 19);
+                    break;
+                case 2:
+                    palavra[i] = aleatorio(0, 14);
+                    break;
+                case 3:
+                    palavra[i] = aleatorio(0, 19);
+                    break;
+                case 4:
+                    palavra[i] = aleatorio(0, 42);
+                    break;
+            }
+        }
+        else{
+            switch(tema){
+                case 0:
+                    palavra[i] = aleatorio(0, 36);
+                    break;
+                case 1:
+                    palavra[i] = aleatorio(0, 19);
+                    break;
+                case 2:
+                    palavra[i] = aleatorio(0, 14);
+                    break;
+                case 3:
+                    palavra[i] = aleatorio(0, 19);
+                    break;
+                case 4:
+                    palavra[i] = aleatorio(0, 42);
+                    break;
+            }
+            while(palavra[i] == palavra[i - passo]){
+                switch(tema){
+                    case 0:
+                        palavra[i] = aleatorio(0, 36);
+                        break;
+                    case 1:
+                        palavra[i] = aleatorio(0, 19);
+                        break;
+                    case 2:
+                        palavra[i] = aleatorio(0, 14);
+                        break;
+                    case 3:
+                        palavra[i] = aleatorio(0, 19);
+                        break;
+                    case 4:
+                        palavra[i] = aleatorio(0, 42);
+                        break;
+                }
+                if(passo < totalNomes) passo++;
+            }
+        }
+    }
+    consoleSelect(&bottomScreen);
+
+
+    for(int i = 0; i < totalNomes; i++){
+        while(pmMainLoop()){
+            consoleSelect(&topScreen);
+            consoleClear();
+
+            iprintf("\n\n\n\n\n\n\n\n     Para ver sua palavra\n     segure Y");
+            iprintf("\n\n  Para prosseguir pressione A");
+
+            consoleSelect(&bottomScreen);
+            consoleClear();
+
+            scanKeys();
+            int key = keysHeld();
+            int key2 = keysDown();
+
+            iprintf("\n\n          %s\n\n\n\n\n\n\n\n", nomes[i]);
+
+            if(key & KEY_Y){
+                switch(tema){
+                    case 0:
+                        iprintf("          %s", comidas[palavra[i]]);
+                        break;
+                    case 1:
+                        iprintf("          %s", paises[palavra[i]]);
+                        break;
+                    case 2:
+                        iprintf("          %s", emocoes[palavra[i]]);
+                        break;
+                    case 3:
+                        iprintf("          %s", profissoes[palavra[i]]);
+                        break;
+                    case 4:
+                        iprintf("          %s", animais[palavra[i]]);
+                        break;
+                }
+            }
+            
+            if(key2 & KEY_A) break;
+                
+            swiWaitForVBlank();
+        }   
+    }
+    int primeiro = aleatorio(0, totalNomes);
+
+    while(pmMainLoop()){
+        scanKeys();
+        int key2 = keysHeld();
+        int key = keysDown();
+
+        consoleSelect(&topScreen);
+        consoleClear();
+
+        iprintf("\n\n\n\n\n\n\n\n\n  Pressione Start para voltar\n            ao menu");
+        iprintf("\n\n   Segure Y para revelar o\n            impostor");
+
+        consoleSelect(&bottomScreen);
+        consoleClear();
+
+        iprintf("\n\n\n\n\n\n\n\n\n\n\n    %s vai comecar!", nomes[primeiro]);
+
+        if(key2 & KEY_Y){
+            iprintf("\n\n    Impostor: TODO MUNDO!");
+        }
+        if(key & KEY_START){
+            return;
+        }
+
+        swiWaitForVBlank();
+    }    
 }
